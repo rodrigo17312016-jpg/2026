@@ -297,9 +297,28 @@ body{padding-bottom:70px}
   </div>
   <p class="hero-age"><em>Hoy cumples 21 años, mi pequeña 🎉</em></p>
 
-  <div class="scroll-cta" id="suspense-btn" onclick="handleSuspense()">
-    <span id="suspense-text">¿Tienes curiosidad? Baja y descúbrelo</span>
-    <span class="arrow" id="suspense-arrow">↓</span>
+  <!-- SUSPENSE BLOCK -->
+  <div id="suspense-block" style="position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.8rem;width:90%;max-width:340px">
+    
+    <!-- Step 1: tap button -->
+    <div class="scroll-cta" id="suspense-btn" onclick="handleSuspense()" style="width:100%;justify-content:center">
+      <span id="suspense-text">¿Tienes curiosidad? Baja y descúbrelo</span>
+      <span class="arrow" id="suspense-arrow">↓</span>
+    </div>
+
+    <!-- Step 2: password input (hidden until 3 taps) -->
+    <div id="password-box" style="display:none;width:100%;flex-direction:column;align-items:center;gap:.6rem;animation:up .5s forwards">
+      <p style="font-family:'Playfair Display',serif;font-style:italic;color:#f48fb1;font-size:.95rem;text-align:center;margin:0">¿Y quién es tu amor? 💕</p>
+      <div style="display:flex;gap:.5rem;width:100%">
+        <input id="love-input" type="text" placeholder="Escribe su nombre..." 
+          style="flex:1;background:rgba(194,24,91,.12);border:1px solid rgba(194,24,91,.4);border-radius:100px;padding:.65rem 1.2rem;color:#fff;font-family:'Nunito',sans-serif;font-size:.95rem;outline:none;text-align:center"
+          onkeydown="if(event.key==='Enter')checkPassword()"
+          oninput="clearError()">
+        <button onclick="checkPassword()" style="background:linear-gradient(135deg,#c2185b,#e91e63);border:none;border-radius:100px;padding:.65rem 1.3rem;color:#fff;font-size:1rem;cursor:pointer;font-weight:700">→</button>
+      </div>
+      <p id="love-error" style="color:#f06292;font-size:.8rem;opacity:0;transition:opacity .3s;margin:0;font-style:italic"></p>
+    </div>
+
   </div>
 </section>
 
@@ -469,31 +488,38 @@ for(let i=0;i<35;i++){
 // SMOOTH SCROLL
 function smoothScroll(id){document.querySelector(id).scrollIntoView({behavior:'smooth'})}
 
-// SUSPENSE LOGIC
+// SUSPENSE + PASSWORD LOGIC
 let suspenseTaps = 0;
 const suspenseMessages = [
   { text: "¡Eso es todo lo que tienes? 😏", arrow: "↑" },
   { text: "¡Vamos, inténtalo otra vez! 🔥", arrow: "↑" },
-  { text: "Bien... ya me convenciste 😌 ↓", arrow: "↓" },
+  { text: "Bien... ya me convenciste 😌", arrow: "💕" },
 ];
 
+// Block scrolling initially
+document.body.style.overflow = 'hidden';
+document.documentElement.style.overflow = 'hidden';
+
+function unlockScroll() {
+  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
+  smoothScroll('#surprise');
+}
+
 function handleSuspense() {
+  if (suspenseTaps >= 3) return; // already showing password
+
   const btn = document.getElementById('suspense-btn');
   const txt = document.getElementById('suspense-text');
   const arr = document.getElementById('suspense-arrow');
 
-  if (suspenseTaps >= 3) {
-    smoothScroll('#surprise');
-    return;
-  }
-
-  // Shake/bounce up animation
-  btn.style.transition = 'transform .15s';
-  btn.style.transform = 'translateY(-18px) scale(1.08)';
+  // Bounce animation
+  btn.style.transition = 'transform .12s';
+  btn.style.transform = 'translateY(-16px) scale(1.07)';
   setTimeout(() => {
-    btn.style.transform = 'translateY(4px)';
-    setTimeout(() => { btn.style.transform = ''; }, 150);
-  }, 150);
+    btn.style.transform = 'translateY(3px)';
+    setTimeout(() => { btn.style.transform = ''; }, 130);
+  }, 130);
 
   // Update message
   const msg = suspenseMessages[suspenseTaps];
@@ -506,14 +532,58 @@ function handleSuspense() {
     arr.style.transition = 'opacity .3s';
     txt.style.opacity = '1';
     arr.style.opacity = '1';
-  }, 200);
+  }, 180);
 
   suspenseTaps++;
 
-  // On 3rd tap, auto scroll after short delay
+  // After 3 taps: show password box, disable button
   if (suspenseTaps === 3) {
-    setTimeout(() => smoothScroll('#surprise'), 900);
+    setTimeout(() => {
+      btn.style.pointerEvents = 'none';
+      btn.style.opacity = '.5';
+      const pbox = document.getElementById('password-box');
+      pbox.style.display = 'flex';
+      setTimeout(() => {
+        document.getElementById('love-input').focus();
+      }, 300);
+    }, 500);
   }
+}
+
+function checkPassword() {
+  const val = document.getElementById('love-input').value.trim().toLowerCase();
+  const err = document.getElementById('love-error');
+  if (val === 'rodrigo') {
+    // Correct! Heart burst then unlock
+    const input = document.getElementById('love-input');
+    input.style.borderColor = '#e91e63';
+    input.style.boxShadow = '0 0 20px rgba(233,30,99,.5)';
+    input.value = '❤️ ¡Correcto, mi pequeña!';
+    input.disabled = true;
+    err.style.opacity = '0';
+    // Mini heart burst
+    for(let i=0;i<12;i++){
+      const h=document.createElement('div');
+      h.textContent=['💕','🌹','✨','💖'][Math.floor(Math.random()*4)];
+      h.style.cssText='position:fixed;left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;font-size:'+(Math.random()*1.2+.8)+'rem;pointer-events:none;z-index:9999;animation:fw-burst .8s ease-out forwards;--bx:'+(Math.random()-0.5)*200+'px;--by:'+(Math.random()-1)*200+'px';
+      document.body.appendChild(h);
+      setTimeout(()=>h.remove(),900);
+    }
+    setTimeout(() => unlockScroll(), 1200);
+  } else if (val !== '') {
+    err.textContent = 'Mmm... ese no es 😏 Piénsalo bien';
+    err.style.opacity = '1';
+    const input = document.getElementById('love-input');
+    input.style.borderColor = '#f06292';
+    input.style.animation = 'shake .3s ease';
+    setTimeout(()=>{ input.style.animation=''; input.style.borderColor=''; },400);
+  }
+}
+
+function clearError() {
+  const err = document.getElementById('love-error');
+  err.style.opacity = '0';
+  document.getElementById('love-input').style.borderColor = '';
 }
 
 // NAV DOTS
@@ -564,7 +634,7 @@ document.getElementById('modal').addEventListener('click',function(e){if(e.targe
 // CONFETTI
 // Fireworks style - feminine
 const fwStyle=document.createElement('style');
-fwStyle.textContent=`
+fwStyle.textContent=`@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 @keyframes fw-rise{0%{transform:translate(var(--sx),100vh) scale(0);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translate(var(--sx),var(--ey)) scale(1);opacity:0}}
 @keyframes fw-burst{0%{transform:translate(0,0) scale(0);opacity:1}100%{transform:translate(var(--bx),var(--by)) scale(1);opacity:0}}
 @keyframes sparkle{0%,100%{opacity:0;transform:scale(0)}50%{opacity:1;transform:scale(1)}}
