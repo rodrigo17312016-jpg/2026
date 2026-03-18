@@ -233,29 +233,16 @@ section{position:relative;z-index:1;min-height:100vh;min-height:100dvh;display:f
 
 /* RESPONSIVE */
 @media(max-width:768px){
-  /* ── GALERÍA: carrusel de 1 foto a la vez ── */
-  #gallery{padding:3rem 0 4rem;overflow:hidden}
+  /* ── GALERÍA: columna vertical, una foto a la vez ── */
+  #gallery{padding:3rem 1rem 4rem}
   .gallery-wrap{width:100%;max-width:100%}
   .gallery-grid{
     display:flex;
-    flex-direction:row;
-    overflow-x:scroll;
-    scroll-snap-type:x mandatory;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-    gap:0;
-    padding:0;
+    flex-direction:column;
+    gap:1.8rem;
   }
-  .gallery-grid::-webkit-scrollbar{display:none}
-  .gcard{
-    flex:0 0 calc(100vw - 2.5rem);
-    scroll-snap-align:center;
-    margin:0 .6rem;
-    border-radius:18px;
-  }
-  .gcard:first-child{margin-left:1.25rem}
-  .gcard:last-child{margin-right:1.25rem}
-  .gcard img{max-height:72vw;width:100%;object-fit:cover}
+  .gcard{width:100%}
+  .gcard img{max-height:78vw;width:100%;object-fit:cover}
   /* Leyenda siempre visible en móvil */
   .gcap{opacity:1;transform:translateY(0)}
   .gcap-title{font-size:1rem}
@@ -533,6 +520,20 @@ body{padding-bottom:70px}
 </nav>
 
 <script>
+// BLOQUEAR ZOOM (pinch y doble tap)
+document.addEventListener('touchstart', function(e){
+  if(e.touches.length > 1) e.preventDefault();
+}, {passive:false});
+document.addEventListener('gesturestart', function(e){
+  e.preventDefault();
+}, {passive:false});
+let lastTap = 0;
+document.addEventListener('touchend', function(e){
+  const now = Date.now();
+  if(now - lastTap < 300) e.preventDefault();
+  lastTap = now;
+}, {passive:false});
+
 // PETALS
 const pc = document.getElementById('particles');
 const colors = ['#e91e63','#c2185b','#f06292','#ad1457','#ff80ab'];
