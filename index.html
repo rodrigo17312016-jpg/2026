@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Feliz 21 Marizela 🌹</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -234,13 +233,39 @@ section{position:relative;z-index:1;min-height:100vh;min-height:100dvh;display:f
 
 /* RESPONSIVE */
 @media(max-width:768px){
-  .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem}
+  /* ── GALERÍA: carrusel de 1 foto a la vez ── */
+  #gallery{padding:3rem 0 4rem;overflow:hidden}
+  .gallery-wrap{width:100%;max-width:100%}
+  .gallery-grid{
+    display:flex;
+    flex-direction:row;
+    overflow-x:scroll;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    gap:0;
+    padding:0;
+  }
+  .gallery-grid::-webkit-scrollbar{display:none}
+  .gcard{
+    flex:0 0 calc(100vw - 2.5rem);
+    scroll-snap-align:center;
+    margin:0 .6rem;
+    border-radius:18px;
+  }
+  .gcard:first-child{margin-left:1.25rem}
+  .gcard:last-child{margin-right:1.25rem}
+  .gcard img{max-height:72vw;width:100%;object-fit:cover}
+  /* Leyenda siempre visible en móvil */
+  .gcap{opacity:1;transform:translateY(0)}
+  .gcap-title{font-size:1rem}
+  .gcap-sub{font-size:.85rem}
+
+  /* Resto de ajustes móvil */
   .rgrid{grid-template-columns:1fr}
-  .letter-box{padding:2.5rem 1.5rem}
+  .letter-box{padding:2rem 1.4rem}
   .surprise-cards{gap:.8rem;padding:0 .5rem}
   .surp-card{min-width:140px;max-width:100%;flex:1 1 140px}
-  /* Mostrar leyenda de galería siempre en móvil (no hay hover) */
-  .gcap{opacity:1;transform:translateY(0)}
   .sec-title{font-size:clamp(1.4rem,5vw,2.4rem)}
   #letter-sec{padding:3rem 1.2rem}
   #reasons-sec{padding:3rem 1.2rem}
@@ -251,19 +276,14 @@ section{position:relative;z-index:1;min-height:100vh;min-height:100dvh;display:f
   .letter-p{font-size:.95rem;line-height:1.85}
   .surp-card{min-width:120px;padding:1.4rem 1rem}
   .surp-card .icon{font-size:2rem}
-  .gallery-grid{grid-template-columns:1fr 1fr;gap:.5rem}
-  .gcard img{max-height:200px}
   #suspense-block{width:95%;max-width:none}
   .final-bloom{font-size:3.5rem}
   .rnum{font-size:1.8rem;min-width:28px}
   #hero{padding:2rem 1rem 8rem}
   #surprise{padding:3rem 1rem}
-  #gallery{padding:3rem 1rem 4rem}
   .scroll-cta{padding:.7rem 1.2rem;font-size:.8rem}
 }
 @media(max-width:360px){
-  .gallery-grid{grid-template-columns:1fr}
-  .gcard img{max-height:250px}
   .surprise-cards{flex-direction:column;align-items:stretch}
   .surp-card{min-width:unset;max-width:unset;width:100%;flex:none}
   .letter-box{padding:1.5rem .9rem}
