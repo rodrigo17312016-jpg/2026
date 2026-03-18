@@ -78,6 +78,8 @@ section{position:relative;z-index:1;min-height:100vh;min-height:100dvh;display:f
 }
 .scroll-cta:hover{background:rgba(194,24,91,.25)}
 .scroll-cta .arrow{animation:bounce .9s ease-in-out infinite;font-size:1.2rem}
+/* Anular el position:absolute del scroll-cta cuando está dentro del suspense block */
+#suspense-btn{position:relative;bottom:auto;left:auto;transform:none;width:100%;opacity:1;animation:up .8s 1.2s both;box-sizing:border-box}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
 
 /* NAV BUTTONS */
@@ -336,7 +338,7 @@ body{padding-bottom:70px}
   <p class="hero-age"><em>Hoy cumples 21 años, mi pequeña 🎉</em></p>
 
   <!-- SUSPENSE BLOCK -->
-  <div id="suspense-block" style="position:absolute;bottom:max(4rem, calc(3rem + env(safe-area-inset-bottom)));left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.8rem;width:92%;max-width:360px">
+  <div id="suspense-block" style="position:absolute;bottom:max(4.5rem, calc(3.5rem + env(safe-area-inset-bottom)));left:0;right:0;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:.8rem;width:min(360px, calc(100% - 2.5rem));box-sizing:border-box">
     
     <!-- Step 1: tap button -->
     <div class="scroll-cta" id="suspense-btn" onclick="handleSuspense()" style="width:100%;justify-content:center">
@@ -547,7 +549,18 @@ function unlockScroll() {
   document.documentElement.style.overflow = '';
   document.removeEventListener('touchmove', _noTouch);
   document.removeEventListener('wheel', _noWheel);
+  if (window.visualViewport) window.visualViewport.removeEventListener('resize', _vvFix);
   smoothScroll('#surprise');
+}
+
+// iOS: cuando el teclado abre, el viewport se encoge y hace scroll — lo evitamos
+function _vvFix() {
+  if (document.getElementById('love-input') === document.activeElement) {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', _vvFix);
 }
 
 function handleSuspense() {
@@ -587,9 +600,11 @@ function handleSuspense() {
       btn.style.opacity = '.5';
       const pbox = document.getElementById('password-box');
       pbox.style.display = 'flex';
-      setTimeout(() => {
-        document.getElementById('love-input').focus();
-      }, 300);
+      // No hacemos .focus() automático en móvil para evitar que el teclado
+      // empuje la pantalla y revele la siguiente sección
+      if (!('ontouchstart' in window)) {
+        setTimeout(() => { document.getElementById('love-input').focus(); }, 300);
+      }
     }, 500);
   }
 }
